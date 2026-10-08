@@ -23,10 +23,7 @@ sourceSets {
             exclude 'me/cortex/voxy/client/core/util/IrisUtil.java'
             exclude 'me/cortex/voxy/client/mixin/iris/**'
 
-            // Sodium config API (changed in Sodium 0.6.x)
-            exclude 'me/cortex/voxy/client/config/SodiumConfigBuilder.java'
-            exclude 'me/cortex/voxy/client/config/VoxyConfigMenu.java'
-            exclude 'me/cortex/voxy/client/config/IConfigPageSetter.java'
+            // Sodium 0.8 config API page (VoxyConfigMenu) is built; registered via neoforge.mods.toml modproperties
             // SodiumOptionsAPI page: that API only exists for Sodium 0.6; loaded reflectively, so
             // without it Voxy falls back to the NeoForge config screen (Mods menu).
             exclude 'me/cortex/voxy/client/config/VoxySodiumOptions.java'

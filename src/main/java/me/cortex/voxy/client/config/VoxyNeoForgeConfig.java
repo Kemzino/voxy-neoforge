@@ -115,6 +115,26 @@ public class VoxyNeoForgeConfig {
         VoxyConfig.CONFIG.save();
     }
 
+    /**
+     * Writes VoxyConfig back into the NeoForge config. The Sodium Video Settings page edits VoxyConfig directly; the
+     * TOML overwrites VoxyConfig on every load, so without this its changes would be lost on the next start.
+     */
+    public static void syncFromVoxyConfig() {
+        if (!SPEC.isLoaded()) {
+            return;
+        }
+        ENABLED.set(VoxyConfig.CONFIG.enabled);
+        ENABLE_RENDERING.set(VoxyConfig.CONFIG.enableRendering);
+        INGEST_ENABLED.set(VoxyConfig.CONFIG.ingestEnabled);
+        SECTION_RENDER_DISTANCE.set(VoxyConfig.CONFIG.sectionRenderDistance);
+        SERVICE_THREADS.set(VoxyConfig.CONFIG.serviceThreads);
+        SUB_DIVISION_SIZE.set((double) VoxyConfig.CONFIG.subDivisionSize);
+        USE_ENVIRONMENTAL_FOG.set(VoxyConfig.CONFIG.useEnvironmentalFog);
+        DONT_USE_SODIUM_BUILDER_THREADS.set(VoxyConfig.CONFIG.dontUseSodiumBuilderThreads);
+        RENDER_STATISTICS.set(RenderStatistics.enabled);
+        SPEC.save();
+    }
+
     @SubscribeEvent
     public static void onConfigLoad(ModConfigEvent.Loading event) {
         if (event.getConfig().getSpec() == SPEC) {

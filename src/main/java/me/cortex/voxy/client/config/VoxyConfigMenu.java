@@ -5,7 +5,6 @@ import me.cortex.voxy.client.config.SodiumConfigBuilder.*;
 import me.cortex.voxy.client.VoxyClient;
 import me.cortex.voxy.client.VoxyClientInstance;
 import me.cortex.voxy.client.core.IGetVoxyRenderSystem;
-import me.cortex.voxy.client.core.util.IrisUtil;
 import me.cortex.voxy.common.util.cpu.CpuLayout;
 import me.cortex.voxy.commonImpl.VoxyCommon;
 import net.caffeinemc.mods.sodium.api.config.ConfigEntryPoint;
@@ -29,13 +28,16 @@ public class VoxyConfigMenu implements ConfigEntryPoint {
 
         final var RENDER_RELOAD = OptionFlag.REQUIRES_RENDERER_RELOAD.getId().toString();
 
-        SodiumConfigBuilder.buildToSodium(B, cc, CFG::save, postOp->{
+        SodiumConfigBuilder.buildToSodium(B, cc, ()->{
+                    CFG.save();
+                    VoxyNeoForgeConfig.syncFromVoxyConfig();//the NeoForge TOML is what is loaded on start
+                }, postOp->{
                     postOp.register("voxy:update_threads", ()->{
                         var instance = VoxyCommon.getInstance();
                         if (instance != null) {
                             instance.updateDedicatedThreads();
                         }
-                    }, "voxy:enabled").register("voxy:iris_reload", ()->IrisUtil.reload());
+                    }, "voxy:enabled").register("voxy:iris_reload", ()->{});//NeoForge port: no Iris integration, nothing to reload
                 },
                 new Page(Component.translatable("voxy.config.general"),
                         new Group(

@@ -44,3 +44,8 @@ config="client.voxy.mixins.json"
 
 [[mixins]]
 config="common.voxy.mixins.json"
+
+# Sodium 0.8 discovers config pages through this mod property (the Fabric "sodium:config_api_user" entrypoint):
+# Voxy's settings appear in Video Settings next to Sodium's own pages.
+[modproperties.voxy]
+"sodium:config_api_user" = "me.cortex.voxy.client.config.VoxyConfigMenu"
