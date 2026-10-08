@@ -32,8 +32,9 @@ public abstract class MixinDefaultChunkRenderer extends ShaderChunkRenderer {
 
     // Sodium 0.6.13: render signature is (ChunkRenderMatrices, CommandList, ChunkRenderListIterable, TerrainRenderPass, CameraTransform)
     // boolean indexedRenderingEnabled parameter removed in Sodium 0.6.x
+    // Sodium 0.8 added a trailing boolean to render(); handlers must mirror the full signature.
     @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
-    private void cancelThingie(ChunkRenderMatrices matrices, CommandList commandList, ChunkRenderListIterable renderLists, TerrainRenderPass renderPass, CameraTransform camera, CallbackInfo ci) {
+    private void cancelThingie(ChunkRenderMatrices matrices, CommandList commandList, ChunkRenderListIterable renderLists, TerrainRenderPass renderPass, CameraTransform camera, boolean sodium08Flag, CallbackInfo ci) {
         if (VoxyClient.disableSodiumChunkRender()) {
             super.begin(renderPass);
             this.doRender(matrices, renderPass, camera);
@@ -43,7 +44,7 @@ public abstract class MixinDefaultChunkRenderer extends ShaderChunkRenderer {
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/ShaderChunkRenderer;end(Lnet/caffeinemc/mods/sodium/client/render/chunk/terrain/TerrainRenderPass;)V", shift = At.Shift.BEFORE))
-    private void injectRender(ChunkRenderMatrices matrices, CommandList commandList, ChunkRenderListIterable renderLists, TerrainRenderPass renderPass, CameraTransform camera, CallbackInfo ci) {
+    private void injectRender(ChunkRenderMatrices matrices, CommandList commandList, ChunkRenderListIterable renderLists, TerrainRenderPass renderPass, CameraTransform camera, boolean sodium08Flag, CallbackInfo ci) {
         this.doRender(matrices, renderPass, camera);
     }
 

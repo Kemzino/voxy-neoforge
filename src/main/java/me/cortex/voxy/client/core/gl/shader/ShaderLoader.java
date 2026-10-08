@@ -48,8 +48,9 @@ public class ShaderLoader {
         // The leading \n is critical for the regex to work
         String processed = "\n" + shaderSource + "\n//beans";
 
-        // Apply Sodium's shader constants processing (handles #define etc.)
-        processed = ShaderParser.parseShader(processed, ShaderConstants.builder().build());
+        // Apply Sodium's shader constants processing (handles #define etc.).
+        // Sodium 0.8 returns a ParsedShader record instead of the bare source string.
+        processed = ShaderParser.parseShader(processed, ShaderConstants.builder().build()).src();
 
         // Normalize line endings and strip original #version (upstream behavior)
         processed = processed.replaceAll("\r\n", "\n");

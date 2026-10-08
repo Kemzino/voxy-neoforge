@@ -27,6 +27,9 @@ sourceSets {
             exclude 'me/cortex/voxy/client/config/SodiumConfigBuilder.java'
             exclude 'me/cortex/voxy/client/config/VoxyConfigMenu.java'
             exclude 'me/cortex/voxy/client/config/IConfigPageSetter.java'
+            // SodiumOptionsAPI page: that API only exists for Sodium 0.6; loaded reflectively, so
+            // without it Voxy falls back to the NeoForge config screen (Mods menu).
+            exclude 'me/cortex/voxy/client/config/VoxySodiumOptions.java'
 
             // ModMenu integration (Fabric-only)
             exclude 'me/cortex/voxy/client/config/ModMenuIntegration.java'
@@ -173,6 +176,9 @@ if (!isInGHA) {
     }
 }
 
+// Holds the published Sodium jar; see extractSodium.
+configurations { sodiumWrapper }
+
 dependencies {
     // To change the versions see the gradle.properties file
     implementation "net.neoforged:neoforge:${project.neoforge_version}"
@@ -180,8 +186,11 @@ dependencies {
     // Forgified Fabric API for compatibility (includes Fabric Loader API)
     implementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:${project.forgified_fabric_version}"
 
-    // Sodium for NeoForge (0.6.13 - latest for MC 1.21.1)
-    implementation "maven.modrinth:sodium:mc1.21.1-0.6.13-neoforge"
+    // Sodium for NeoForge 0.8.13 (what the Terrarium pack ships); the 0.6 API this port was written
+    // against no longer exists at runtime there. The Modrinth jar is only a jar-in-jar wrapper, so
+    // the actual mod jar is pulled out of it by extractSodium below.
+    sodiumWrapper "maven.modrinth:sodium:mc1.21.1-0.8.13-neoforge"
+    compileOnly files(layout.buildDirectory.file("sodium/sodium-mod.jar")).builtBy("extractSodium")
 
     // Lithium for NeoForge (0.15.1 - latest for MC 1.21.1)
     implementation("maven.modrinth:lithium:mc1.21.1-0.15.1-neoforge")
@@ -490,4 +499,13 @@ if (!isInGHA) {
             exclude group: 'net.fabricmc', module: 'fabric-loader'
         }*/
     }
+}
+// Sodium 0.8 on NeoForge ships its classes in META-INF/jarjar/*-mod.jar inside the published jar.
+tasks.register('extractSodium', Copy) {
+    from({ zipTree(configurations.sodiumWrapper.singleFile) }) {
+        include 'META-INF/jarjar/net.caffeinemc.sodium-neoforge-*-mod.jar'
+        eachFile { it.path = 'sodium-mod.jar' }
+    }
+    into layout.buildDirectory.dir('sodium')
+    includeEmptyDirs = false
 }
